@@ -9,7 +9,7 @@ export default function Home() {
 
       <main className="p-4 text-center">
         <h1 className="text-4xl font-bold text-gray-800 mb-4">
-          Bem-vindo ao Vôlei Organizer!
+          Bem-vindo Vôlei só os Fortes💪🏐!
         </h1>
         <p className="text-lg text-gray-600">
           Próxima Etapa: Conectar ao Supabase.

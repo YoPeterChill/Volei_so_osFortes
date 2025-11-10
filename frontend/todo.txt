@@ -1,0 +1,1 @@
+-> Corrigir problema do redirect com o link do emial para confirmação do nome do usuário

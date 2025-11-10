@@ -7,6 +7,7 @@ import Link from 'next/link';
 export default function SignUp() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [fullName, setFullName] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
     const router = useRouter();
@@ -16,26 +17,27 @@ export default function SignUp() {
         setLoading(true);
         setMessage('');
 
-        const { data, error } = await supabase.auth.signUp({
+        // 1. Define a URL de redirecionamento (deve ser exata, sem query strings)
+        const redirectUrl = `${window.location.origin}/auth/update-profile`;
+
+        // 🚨 PASSO CRÍTICO: SALVA O NOME NO NAVEGADOR
+        localStorage.setItem('pending_full_name', fullName);
+
+        // 2. Chama o Supabase Auth para cadastro e configura o redirecionamento
+        const { error: authError } = await supabase.auth.signUp({
             email,
             password,
+            options: {
+                redirectTo: redirectUrl,
+            },
         });
 
-        if (error) {
-            setMessage(`Erro ao cadastrar: ${error.message}`);
-            setLoading(false);
-            return;
-        }
-
-        if (data.user) {
-            // O Supabase enviará um e-mail de confirmação por padrão (se configurado)
-            setMessage('Sucesso! Verifique seu email para confirmar o cadastro e faça login.');
-
-            // O Supabase trigger criará o perfil na tabela 'profiles' automaticamente.
-            // Não precisamos fazer uma chamada adicional aqui, apenas guiar o usuário.
-        } else if (data.session) {
-            // Caso a confirmação de e-mail esteja desligada e já logue:
-            router.push('/');
+        if (authError) {
+            // Se houver erro de Auth, remove o nome do storage para não usarmos depois
+            localStorage.removeItem('pending_full_name');
+            setMessage(`Erro ao cadastrar: ${authError.message}`);
+        } else {
+            setMessage('Sucesso! Verifique seu email para confirmar o cadastro. Você será redirecionado para finalizar o perfil após a confirmação.');
         }
 
         setLoading(false);
@@ -54,6 +56,17 @@ export default function SignUp() {
                     </p>
                 )}
                 <form className="space-y-6" onSubmit={handleSignUp}>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Nome Completo (como jogador)</label>
+                        <input
+                            type="text"
+                            required
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
+                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 text-black"
+                            disabled={loading}
+                        />
+                    </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Email</label>
                         <input
