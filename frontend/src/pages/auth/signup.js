@@ -24,11 +24,12 @@ export default function SignUp() {
         localStorage.setItem('pending_full_name', fullName);
 
         // 2. Chama o Supabase Auth para cadastro e configura o redirecionamento
+        //    Para email o campo correto é emailRedirectTo (redirectTo é usado para OAuth)
         const { error: authError } = await supabase.auth.signUp({
             email,
             password,
             options: {
-                redirectTo: redirectUrl,
+                emailRedirectTo: redirectUrl,
             },
         });
 
@@ -104,6 +105,6 @@ export default function SignUp() {
                     </Link>
                 </p>
             </div>
-        </div>
+        </div >
     );
 }
